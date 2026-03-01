@@ -21,9 +21,11 @@
   "main": "index.js",
   "scripts": {
     "test": "TODO",
-    "format": "oxfmt"
+    "format": "oxfmt",
+    "typecheck": "tsgo --noEmit"
   },
   "devDependencies": {
+    "@typescript/native-preview": "^7.0.0-dev.20260301.1",
     "oxfmt": "^0.35.0",
     "zod": "^3.25.0 || ^4.0.0"
   },
