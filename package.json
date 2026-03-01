@@ -20,6 +20,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "build": "tsdown",
     "format": "oxfmt",
     "test": "vitest run",
     "typecheck": "tsgo --noEmit"
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@typescript/native-preview": "^7.0.0-dev.20260301.1",
     "oxfmt": "^0.35.0",
+    "tsdown": "^0.21.0-beta.2",
     "vitest": "^4.0.18",
     "zod": "^3.25.0 || ^4.0.0"
   },
