@@ -3,23 +3,27 @@
   "version": "0.1.0",
   "description": "TODO",
   "keywords": [
-    "zod",
+    "cli",
     "parseArgs",
-    "cli"
+    "zod"
   ],
   "homepage": "https://github.com/ShikChen/zod-parse-args#readme",
   "bugs": {
     "url": "https://github.com/ShikChen/zod-parse-args/issues"
   },
+  "license": "MIT",
+  "author": "Shik Chen",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ShikChen/zod-parse-args.git"
   },
-  "license": "MIT",
-  "author": "Shik Chen",
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "TODO"
+    "test": "TODO",
+    "format": "oxfmt"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.35.0"
   }
 }
