@@ -1,0 +1,36 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`help 1`] = `
+"A simple key-value store
+
+Usage: test [OPTIONS] <COMMAND>
+
+Commands:
+  get  Get a value
+  set  Set a value
+
+Options:
+  --help     Show this help message
+  --version  Show version information"
+`;
+
+exports[`help 2`] = `
+"Get a value
+
+Usage: test get [OPTIONS]
+
+Options:
+  --key <string>  Key to look up (required)
+  --help          Show this help message"
+`;
+
+exports[`help 3`] = `
+"Set a value
+
+Usage: test set [OPTIONS]
+
+Options:
+  --key <string>    Key to update (required)
+  --value <number>  Value to store (required)
+  --help            Show this help message"
+`;
