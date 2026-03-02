@@ -8,9 +8,9 @@ import {
   preprocess,
   repr,
   unwrapSchema,
-} from "./util";
-import { SchemaError } from "./errors";
-import type { RawParseIssue } from "./types";
+} from "./util.ts";
+import { SchemaError } from "./errors.ts";
+import type { RawParseIssue } from "./types.ts";
 
 function parseValueIssue(expected: string, input: unknown): RawParseIssue {
   return {

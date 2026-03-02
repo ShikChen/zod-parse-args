@@ -1,6 +1,6 @@
 import * as z from "zod/v4/core";
-import { AssertionError } from "./errors";
-import type { CommandSpec, FieldSpec, InnerType } from "./types";
+import { AssertionError } from "./errors.ts";
+import type { CommandSpec, FieldSpec, InnerType } from "./types.ts";
 
 export function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {

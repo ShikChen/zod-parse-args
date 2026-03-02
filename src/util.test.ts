@@ -1,5 +1,5 @@
 import { test, expect, vi } from "vitest";
-import { assert, assertNever, repr } from "./util";
+import { assert, assertNever, repr } from "./util.ts";
 
 test("assert", () => {
   expect(assert(1 === 1, "1 !== 1")).toBeUndefined();

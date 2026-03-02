@@ -1,6 +1,6 @@
 import * as z from "zod/v4/core";
-import { assert, enumerateOptionFields, repr } from "./util";
-import type { BoundInput, CommandSpec, FieldSpec, ParseArgsOptions } from "./types";
+import { assert, enumerateOptionFields, repr } from "./util.ts";
+import type { BoundInput, CommandSpec, FieldSpec, ParseArgsOptions } from "./types.ts";
 
 interface HelpItem {
   label: string;

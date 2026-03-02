@@ -9,8 +9,8 @@ import {
   isStringArray,
   repr,
   unwrapSchema,
-} from "./util";
-import { SchemaError } from "./errors";
+} from "./util.ts";
+import { SchemaError } from "./errors.ts";
 import type {
   CommandSpec,
   FieldMap,
@@ -18,7 +18,7 @@ import type {
   FieldSpec,
   FieldValueSpec,
   SubcommandSpec,
-} from "./types";
+} from "./types.ts";
 
 function validateOptionName(name: string): void {
   if (name === "") {

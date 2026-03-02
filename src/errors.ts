@@ -1,4 +1,4 @@
-import type { CommandSpec } from "./types";
+import type { CommandSpec } from "./types.ts";
 
 class CustomError extends Error {
   constructor(message: string) {

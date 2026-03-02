@@ -6,7 +6,7 @@ import {
   safeParseArgsAsync,
   type RootSchema,
   type ParseArgsOptions,
-} from "./index";
+} from "./index.ts";
 import { z } from "zod";
 
 const obj = z.object.bind(z);

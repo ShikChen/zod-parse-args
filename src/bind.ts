@@ -1,5 +1,5 @@
-import { assert, assertNever, enumerateOptionFields } from "./util";
-import type { BoundInput, CommandSpec, Env, FieldSpec, InputRecord, Token } from "./types";
+import { assert, assertNever, enumerateOptionFields } from "./util.ts";
+import type { BoundInput, CommandSpec, Env, FieldSpec, InputRecord, Token } from "./types.ts";
 
 export function bindArgs(spec: CommandSpec, tokens: Token[], env: Env): BoundInput {
   const input: InputRecord = Object.create(null);

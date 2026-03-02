@@ -1,12 +1,12 @@
 import * as z from "zod/v4/core";
-import { buildCoercedSchema } from "./coerce";
-import { compileSchema } from "./compile";
-import { renderHelp, renderZodError } from "./render";
-import { tokenize } from "./tokenize";
-import { bindArgs } from "./bind";
-import { HelpRequested, ParseError, SchemaError, VersionRequested } from "./errors";
-import type { ParseArgsOptions, ParseResult, RootSchema } from "./types";
-export type { ParseArgsOptions, ParseResult, RootSchema } from "./types";
+import { buildCoercedSchema } from "./coerce.ts";
+import { compileSchema } from "./compile.ts";
+import { renderHelp, renderZodError } from "./render.ts";
+import { tokenize } from "./tokenize.ts";
+import { bindArgs } from "./bind.ts";
+import { HelpRequested, ParseError, SchemaError, VersionRequested } from "./errors.ts";
+import type { ParseArgsOptions, ParseResult, RootSchema } from "./types.ts";
+export type { ParseArgsOptions, ParseResult, RootSchema } from "./types.ts";
 
 function handleResult<T>(result: ParseResult<T>): T {
   switch (result.kind) {

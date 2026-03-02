@@ -1,6 +1,6 @@
-import { repr } from "./util";
-import { HelpRequested, ParseError, VersionRequested } from "./errors";
-import type { CommandSpec, SubcommandSpec, Token } from "./types";
+import { repr } from "./util.ts";
+import { HelpRequested, ParseError, VersionRequested } from "./errors.ts";
+import type { CommandSpec, SubcommandSpec, Token } from "./types.ts";
 
 function formatAvailableCommands(sub: SubcommandSpec): string {
   return sub.variants.map((v) => v.values[0]).join(", ");
