@@ -7,7 +7,6 @@ import {
   isDUDef,
   preprocess,
   repr,
-  unwrapSchema,
 } from "./util.ts";
 import { SchemaError } from "./errors.ts";
 import type { RawParseIssue } from "./types.ts";
