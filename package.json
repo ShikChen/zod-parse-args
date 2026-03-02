@@ -33,7 +33,9 @@
     "build": "zshy",
     "format": "oxfmt",
     "test": "vitest run",
-    "typecheck": "tsgo --noEmit"
+    "typecheck": "tsgo --noEmit",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run test && npm run typecheck"
   },
   "devDependencies": {
     "@types/node": "^25.3.3",
