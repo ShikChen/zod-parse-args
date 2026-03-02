@@ -17,10 +17,22 @@
     "type": "git",
     "url": "git+https://github.com/ShikChen/zod-parse-args.git"
   },
+  "files": [
+    "dist"
+  ],
   "type": "module",
-  "main": "index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.cts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "scripts": {
-    "build": "tsdown",
+    "build": "zshy",
     "format": "oxfmt",
     "test": "vitest run",
     "typecheck": "tsgo --noEmit"
@@ -30,11 +42,12 @@
     "@typescript/native-preview": "^7.0.0-dev.20260301.1",
     "@vitest/coverage-v8": "^4.0.18",
     "oxfmt": "^0.35.0",
-    "tsdown": "^0.21.0-beta.2",
     "vitest": "^4.0.18",
-    "zod": "^3.25.0 || ^4.0.0"
+    "zod": "^3.25.0 || ^4.0.0",
+    "zshy": "^0.7.0"
   },
   "peerDependencies": {
     "zod": "^3.25.0 || ^4.0.0"
-  }
+  },
+  "zshy": "./src/index.ts"
 }
