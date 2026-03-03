@@ -31,6 +31,7 @@ for (let i = 0; i < times; i++) {
 
 // $ greet --name World --times 3 --loud
 // => { name: "World", times: 3, loud: true }
+//
 // WORLD
 // WORLD
 // WORLD
@@ -48,7 +49,7 @@ for (let i = 0; i < times; i++) {
 
 ## Subcommands
 
-Use `z.discriminatedUnion` to define subcommands:
+Use [`z.discriminatedUnion()`](https://zod.dev/api#discriminated-unions) to define subcommands:
 
 ```ts
 import { z } from "zod";
@@ -114,6 +115,8 @@ Control how fields map to CLI arguments with `.meta()`:
 | `metavar`     | `string`  | Custom placeholder in help text |
 | `description` | `string`  | Same as `.describe()`           |
 
+All keys are optional. Here's an example using each one:
+
 ```ts
 import { z } from "zod";
 import { parseArgs } from "zod-parse-args";
@@ -128,13 +131,19 @@ const args = parseArgs(
       .enum(["dev", "prod"])
       .describe("Target environment")
       .meta({ long: "env" }),
-    token: z.string().describe("Auth token").meta({ env: "DEPLOY_TOKEN" }),
+    token: z
+      .string()
+      .describe("Authentication token")
+      .meta({ env: "DEPLOY_TOKEN" }),
     timeout: z
       .number()
       .default(30)
       .describe("Deploy timeout")
       .meta({ metavar: "SECONDS" }),
-    force: z.boolean().describe("Skip confirmation").meta({ short: "f" }),
+    force: z
+      .boolean()
+      .describe("Skip confirmation prompt")
+      .meta({ short: "f" }),
   }),
   { name: "ship" },
 );
@@ -153,13 +162,34 @@ const args = parseArgs(
 //
 // Options:
 //   --env <dev|prod>     Target environment (required)
-//   --token <string>     Auth token (env: DEPLOY_TOKEN) (required)
+//   --token <string>     Authentication token (env: DEPLOY_TOKEN) (required)
 //   --timeout <SECONDS>  Deploy timeout (default: 30)
-//   -f, --[no-]force     Skip confirmation
+//   -f, --[no-]force     Skip confirmation prompt
 //   --help               Show this help message
 ```
 
 ## API
+
+### Options
+
+```ts
+interface ParseArgsOptions {
+  // Program name for help text
+  name?: string;
+
+  // Version string (enables --version)
+  version?: string;
+
+  // Arguments to parse (default: process.argv.slice(2))
+  args?: string[];
+
+  // Environment variables (default: process.env)
+  env?: Record<string, string | undefined>;
+
+  // Help text wrap width
+  maxWidth?: number;
+}
+```
 
 ### `parseArgs(schema, options?)`
 
@@ -181,31 +211,6 @@ type ParseResult<T> =
 
 ### `parseArgsAsync(schema, options?)`
 
-Async version of `parseArgs`.
-Required when your schema uses async refinements or transforms.
-
 ### `safeParseArgsAsync(schema, options?)`
 
-Async version of `safeParseArgs`.
-Required when your schema uses async refinements or transforms.
-
-### `ParseArgsOptions`
-
-```ts
-interface ParseArgsOptions {
-  // Program name for help text
-  name?: string;
-
-  // Version string (enables --version)
-  version?: string;
-
-  // Arguments to parse (default: process.argv.slice(2))
-  args?: string[];
-
-  // Environment variables (default: process.env)
-  env?: Record<string, string | undefined>;
-
-  // Help text wrap width
-  maxWidth?: number;
-}
-```
+Async versions. Required when your schema uses async refinements or transforms.
