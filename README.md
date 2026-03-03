@@ -105,14 +105,14 @@ const args = parseArgs(
 
 Control how fields map to CLI arguments with `.meta()`:
 
-| Key           | Type      | Description                                                  |
-| ------------- | --------- | ------------------------------------------------------------ |
-| `positional`  | `boolean` | Treat as positional argument instead of `--option`           |
-| `long`        | `string`  | Override long option name (default: camelCase to kebab-case) |
-| `short`       | `string`  | Single-character short alias                                 |
-| `env`         | `string`  | Environment variable fallback (CLI args take precedence)     |
-| `metavar`     | `string`  | Custom placeholder in help text                              |
-| `description` | `string`  | Description in help text (same as `.describe()`)             |
+| Key           | Type      | Description                     |
+| ------------- | --------- | ------------------------------- |
+| `positional`  | `boolean` | Positional argument             |
+| `long`        | `string`  | Override long option name       |
+| `short`       | `string`  | Single-character short alias    |
+| `env`         | `string`  | Environment variable fallback   |
+| `metavar`     | `string`  | Custom placeholder in help text |
+| `description` | `string`  | Same as `.describe()`           |
 
 ```ts
 import { z } from "zod";
@@ -120,11 +120,21 @@ import { parseArgs } from "zod-parse-args";
 
 const args = parseArgs(
   z.object({
-    source: z.string().meta({ positional: true, description: "Directory to deploy" }),
-    targetEnv: z.enum(["dev", "prod"]).meta({ long: "env", description: "Target environment" }),
-    token: z.string().meta({ env: "DEPLOY_TOKEN", description: "Auth token" }),
-    timeout: z.number().default(30).meta({ metavar: "SECONDS", description: "Deploy timeout" }),
-    force: z.boolean().meta({ short: "f", description: "Skip confirmation" }),
+    source: z
+      .string()
+      .describe("Directory to deploy")
+      .meta({ positional: true }),
+    targetEnv: z
+      .enum(["dev", "prod"])
+      .describe("Target environment")
+      .meta({ long: "env" }),
+    token: z.string().describe("Auth token").meta({ env: "DEPLOY_TOKEN" }),
+    timeout: z
+      .number()
+      .default(30)
+      .describe("Deploy timeout")
+      .meta({ metavar: "SECONDS" }),
+    force: z.boolean().describe("Skip confirmation").meta({ short: "f" }),
   }),
   { name: "ship" },
 );
@@ -153,10 +163,8 @@ const args = parseArgs(
 
 ### `parseArgs(schema, options?)`
 
-Parse `process.argv` (or `options.args`) against the schema.
-On success, returns the fully typed and validated result.
-On `--help` or `--version`, prints and exits.
-On error, prints the error with help text and exits.
+The main entry point. Returns the parsed and validated result,
+or handles `--help`, `--version`, and errors by printing and exiting.
 
 ### `safeParseArgs(schema, options?)`
 
@@ -174,10 +182,12 @@ type ParseResult<T> =
 ### `parseArgsAsync(schema, options?)`
 
 Async version of `parseArgs`.
+Required when your schema uses async refinements or transforms.
 
 ### `safeParseArgsAsync(schema, options?)`
 
 Async version of `safeParseArgs`.
+Required when your schema uses async refinements or transforms.
 
 ### `ParseArgsOptions`
 
