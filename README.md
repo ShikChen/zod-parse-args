@@ -197,7 +197,7 @@ or handles `--help`, `--version`, and errors by printing and exiting.
 
 ### `safeParseArgs(schema, options?)`
 
-Same as `parseArgs` but returns a discriminated union instead of exiting:
+Same as `parseArgs()` but returns a discriminated union instead of exiting:
 
 ```ts
 type ParseResult<T> =
@@ -210,6 +210,8 @@ type ParseResult<T> =
 
 ### `parseArgsAsync(schema, options?)`
 
+Async version of `parseArgs()`, for schemas with async refinements or transforms.
+
 ### `safeParseArgsAsync(schema, options?)`
 
-Async versions. Required when your schema uses async refinements or transforms.
+Async version of `safeParseArgs()`, for schemas with async refinements or transforms.
