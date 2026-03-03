@@ -28,23 +28,22 @@ const { name, times, loud } = parseArgs(
 for (let i = 0; i < times; i++) {
   console.log(loud ? name.toUpperCase() : name);
 }
-```
 
-```
-$ greet --name World --times 3 --loud
-WORLD
-WORLD
-WORLD
-
-$ greet --help
-Usage: greet [OPTIONS]
-
-Options:
-  --name <string>   Name to greet (required)
-  --times <number>  Number of repetitions (default: 1)
-  --[no-]loud       Print in uppercase
-  --help            Show this help message
-  --version         Show version information
+// $ greet --name World --times 3 --loud
+// => { name: "World", times: 3, loud: true }
+// WORLD
+// WORLD
+// WORLD
+//
+// $ greet --help
+// Usage: greet [OPTIONS]
+//
+// Options:
+//   --name <string>   Name to greet (required)
+//   --times <number>  Number of repetitions (default: 1)
+//   --[no-]loud       Print in uppercase
+//   --help            Show this help message
+//   --version         Show version information
 ```
 
 ## Subcommands
@@ -74,31 +73,32 @@ const args = parseArgs(
   ]),
   { name: "app" },
 );
-```
 
-```
-$ app serve --port 8080 --open
-$ app build --minify
-
-$ app --help
-Usage: app [OPTIONS] <COMMAND>
-
-Commands:
-  serve  Start dev server
-  build  Build for production
-
-Options:
-  --help  Show this help message
-
-$ app build --help
-Build for production
-
-Usage: app build [OPTIONS]
-
-Options:
-  --out-dir <string>  Output directory (default: "dist")
-  --[no-]minify       Minify output
-  --help              Show this help message
+// $ app serve --port 8080 --open
+// => { command: "serve", port: 8080, open: true }
+//
+// $ app build --minify
+// => { command: "build", outDir: "dist", minify: true }
+//
+// $ app --help
+// Usage: app [OPTIONS] <COMMAND>
+//
+// Commands:
+//   serve  Start dev server
+//   build  Build for production
+//
+// Options:
+//   --help  Show this help message
+//
+// $ app build --help
+// Build for production
+//
+// Usage: app build [OPTIONS]
+//
+// Options:
+//   --out-dir <string>  Output directory (default: "dist")
+//   --[no-]minify       Minify output
+//   --help              Show this help message
 ```
 
 ## Field Metadata
@@ -128,24 +128,25 @@ const args = parseArgs(
   }),
   { name: "ship" },
 );
-```
 
-```
-$ ship ./dist --env prod -f
-$ DEPLOY_TOKEN=secret ship ./dist --env dev
-
-$ ship --help
-Usage: ship [OPTIONS] <source>
-
-Arguments:
-  <source>  Directory to deploy
-
-Options:
-  --env <dev|prod>     Target environment (required)
-  --token <string>     Auth token (env: DEPLOY_TOKEN) (required)
-  --timeout <SECONDS>  Deploy timeout (default: 30)
-  -f, --[no-]force     Skip confirmation
-  --help               Show this help message
+// $ ship ./dist --env prod -f --token secret
+// => { source: "./dist", targetEnv: "prod", token: "secret", timeout: 30, force: true }
+//
+// $ DEPLOY_TOKEN=secret ship ./dist --env dev
+// => { source: "./dist", targetEnv: "dev", token: "secret", timeout: 30, force: false }
+//
+// $ ship --help
+// Usage: ship [OPTIONS] <source>
+//
+// Arguments:
+//   <source>  Directory to deploy
+//
+// Options:
+//   --env <dev|prod>     Target environment (required)
+//   --token <string>     Auth token (env: DEPLOY_TOKEN) (required)
+//   --timeout <SECONDS>  Deploy timeout (default: 30)
+//   -f, --[no-]force     Skip confirmation
+//   --help               Show this help message
 ```
 
 ## API
@@ -170,16 +171,31 @@ type ParseResult<T> =
   | { kind: "parse-error"; error: string; help: string };
 ```
 
-### `parseArgsAsync(schema, options?)` / `safeParseArgsAsync(schema, options?)`
+### `parseArgsAsync(schema, options?)`
 
-Async versions for schemas with async refinements or transforms.
+Async version of `parseArgs`.
+
+### `safeParseArgsAsync(schema, options?)`
+
+Async version of `safeParseArgs`.
 
 ### `ParseArgsOptions`
 
-| Key        | Type                                  | Description                                           |
-| ---------- | ------------------------------------- | ----------------------------------------------------- |
-| `name`     | `string`                              | Program name for help text                            |
-| `version`  | `string`                              | Version string (enables `--version`)                  |
-| `args`     | `string[]`                            | Arguments to parse (default: `process.argv.slice(2)`) |
-| `env`      | `Record<string, string \| undefined>` | Environment variables (default: `process.env`)        |
-| `maxWidth` | `number`                              | Help text wrap width                                  |
+```ts
+interface ParseArgsOptions {
+  // Program name for help text
+  name?: string;
+
+  // Version string (enables --version)
+  version?: string;
+
+  // Arguments to parse (default: process.argv.slice(2))
+  args?: string[];
+
+  // Environment variables (default: process.env)
+  env?: Record<string, string | undefined>;
+
+  // Help text wrap width
+  maxWidth?: number;
+}
+```
