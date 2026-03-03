@@ -104,16 +104,16 @@ const args = parseArgs(
 
 ## Field Metadata
 
-Control how fields map to CLI arguments with `.meta()`:
+Control how fields map to CLI arguments with [`.meta()`](https://zod.dev/metadata):
 
-| Key           | Type      | Description                     |
-| ------------- | --------- | ------------------------------- |
-| `positional`  | `boolean` | Positional argument             |
-| `long`        | `string`  | Override long option name       |
-| `short`       | `string`  | Single-character short alias    |
-| `env`         | `string`  | Environment variable fallback   |
-| `metavar`     | `string`  | Custom placeholder in help text |
-| `description` | `string`  | Same as `.describe()`           |
+| Key           | Type      | Description                                                |
+| ------------- | --------- | ---------------------------------------------------------- |
+| `positional`  | `boolean` | Positional argument                                        |
+| `long`        | `string`  | Override long option name                                  |
+| `short`       | `string`  | Single-character short alias                               |
+| `env`         | `string`  | Environment variable fallback                              |
+| `metavar`     | `string`  | Custom placeholder in help text                            |
+| `description` | `string`  | Same as [`.describe()`](https://zod.dev/metadata#describe) |
 
 All keys are optional. Here's an example using each one:
 
@@ -123,27 +123,26 @@ import { parseArgs } from "zod-parse-args";
 
 const args = parseArgs(
   z.object({
-    source: z
-      .string()
-      .describe("Directory to deploy")
-      .meta({ positional: true }),
-    targetEnv: z
-      .enum(["dev", "prod"])
-      .describe("Target environment")
-      .meta({ long: "env" }),
-    token: z
-      .string()
-      .describe("Authentication token")
-      .meta({ env: "DEPLOY_TOKEN" }),
-    timeout: z
-      .number()
-      .default(30)
-      .describe("Deploy timeout")
-      .meta({ metavar: "SECONDS" }),
-    force: z
-      .boolean()
-      .describe("Skip confirmation prompt")
-      .meta({ short: "f" }),
+    source: z.string().meta({
+      positional: true,
+      description: "Directory to deploy",
+    }),
+    targetEnv: z.enum(["dev", "prod"]).meta({
+      long: "env",
+      description: "Target environment",
+    }),
+    token: z.string().meta({
+      env: "DEPLOY_TOKEN",
+      description: "Authentication token",
+    }),
+    timeout: z.number().default(30).meta({
+      metavar: "SECONDS",
+      description: "Deploy timeout",
+    }),
+    force: z.boolean().meta({
+      short: "f",
+      description: "Skip confirmation prompt",
+    }),
   }),
   { name: "ship" },
 );
