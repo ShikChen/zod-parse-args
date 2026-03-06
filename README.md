@@ -2,7 +2,7 @@
 
 CLI argument parsing with
 [`util.parseArgs`](https://nodejs.org/api/util.html#utilparseargsconfig)
-simplicity and [Zod](https://zod.dev/) type safety.
+simplicity and [Zod 4](https://zod.dev/) type safety.
 
 - Zero dependencies beyond Zod
 - Minimal API: if you know Zod, you already know how to use it
