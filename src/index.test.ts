@@ -8,6 +8,7 @@ import {
   type ParseArgsOptions,
 } from "./index.ts";
 import { z } from "zod";
+import * as zodMini from "zod/mini";
 
 const obj = z.object.bind(z);
 const lit = z.literal.bind(z);
@@ -362,4 +363,11 @@ test("schema error", () => {
   bad(obj({ arr: posIntArray, kv: kvStoreSchema }));
   const optPosInt = z.int().optional().meta({ positional: true });
   bad(obj({ opt: optPosInt, kv: kvStoreSchema }));
+});
+
+test("zod mini", () => {
+  const z = zodMini;
+  expectOk(z.object({ name: z.string() }), ["--name", "Amy"], { name: "Amy" });
+  expectOk(z.object({ age: z.number() }), ["--age", "18"], { age: 18 });
+  expectOk(z.object({ name: z.string().check(z.trim()) }), ["--name", "Amy "], { name: "Amy" });
 });
