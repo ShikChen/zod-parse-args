@@ -1,6 +1,7 @@
 import type * as z from "zod/v4/core";
 
 // {{{ Public Types
+/** Discriminated union returned by {@link safeParseArgs} and {@link safeParseArgsAsync}. */
 export type ParseResult<T> =
   | { kind: "ok"; data: T }
   | { kind: "help"; help: string }
@@ -9,10 +10,19 @@ export type ParseResult<T> =
   | { kind: "parse-error"; error: string; help: string };
 
 export interface ParseArgsOptions {
+  /** Program name shown in help text. */
   name?: string;
+
+  /** Version string. Enables `--version` when set. */
   version?: string;
+
+  /** Arguments to parse. Defaults to `process.argv.slice(2)`. */
   args?: string[];
+
+  /** Environment variables for `env` fallbacks. Defaults to `process.env`. */
   env?: Record<string, string | undefined>;
+
+  /** Maximum line width for help text. Defaults to 80. */
   maxWidth?: number;
 }
 

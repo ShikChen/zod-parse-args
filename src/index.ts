@@ -105,6 +105,16 @@ function safeParseArgsImpl(
   }
 }
 
+/**
+ * Parse CLI arguments against a Zod schema without exiting the process.
+ *
+ * Returns a discriminated union describing the outcome: parsed data,
+ * help/version text, or an error with help text.
+ *
+ * @param schema - A `z.object()` or `z.discriminatedUnion()` schema defining the CLI interface.
+ * @param opts - Options for program name, version, custom args, env, and help text width.
+ * @returns A {@link ParseResult} indicating success or the kind of failure.
+ */
 export function safeParseArgs<T extends RootSchema>(
   schema: T,
   opts?: ParseArgsOptions,
@@ -112,10 +122,27 @@ export function safeParseArgs<T extends RootSchema>(
   return safeParseArgsImpl(schema, opts ?? {}, z.safeParse);
 }
 
+/**
+ * Parse CLI arguments against a Zod schema.
+ *
+ * On `--help` or `--version`, prints the corresponding output and exits with code 0.
+ * On validation errors, prints the error and help text, then exits with code 1.
+ *
+ * @param schema - A `z.object()` or `z.discriminatedUnion()` schema defining the CLI interface.
+ * @param opts - Options for program name, version, custom args, env, and help text width.
+ * @returns The parsed and validated result, fully typed from the schema.
+ */
 export function parseArgs<T extends RootSchema>(schema: T, opts?: ParseArgsOptions): z.output<T> {
   return handleResult(safeParseArgs(schema, opts));
 }
 
+/**
+ * Async version of {@link safeParseArgs}, for schemas with async refinements or transforms.
+ *
+ * @param schema - A `z.object()` or `z.discriminatedUnion()` schema defining the CLI interface.
+ * @param opts - Options for program name, version, custom args, env, and help text width.
+ * @returns A promise that resolves to a {@link ParseResult} indicating success or the kind of failure.
+ */
 export async function safeParseArgsAsync<T extends RootSchema>(
   schema: T,
   opts?: ParseArgsOptions,
@@ -123,6 +150,13 @@ export async function safeParseArgsAsync<T extends RootSchema>(
   return safeParseArgsImpl(schema, opts ?? {}, z.safeParseAsync);
 }
 
+/**
+ * Async version of {@link parseArgs}, for schemas with async refinements or transforms.
+ *
+ * @param schema - A `z.object()` or `z.discriminatedUnion()` schema defining the CLI interface.
+ * @param opts - Options for program name, version, custom args, env, and help text width.
+ * @returns A promise that resolves to the parsed and validated result, fully typed from the schema.
+ */
 export async function parseArgsAsync<T extends RootSchema>(
   schema: T,
   opts?: ParseArgsOptions,
