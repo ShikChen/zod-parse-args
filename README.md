@@ -109,6 +109,53 @@ const args = parseArgs(
 //   --help              Show this help message
 ```
 
+## Collection Types
+
+Arrays, tuples, and key-value records map naturally to CLI conventions:
+
+- `z.array()` / `z.set()`: repeat the flag (`--tag a --tag b`), or use as variadic positional args
+- `z.tuple()`: fixed number of values after one flag (`--viewport 1280 720`)
+- `z.record()` / `z.map()`: `key=value` pairs (`--env NODE_ENV=prod`)
+
+Here's an example of a test runner that uses all three:
+
+```ts
+import { z } from "zod";
+import { parseArgs } from "zod-parse-args";
+
+const args = parseArgs(
+  z.object({
+    specs: z.array(z.string()).meta({
+      positional: true,
+      description: "Test spec files",
+    }),
+    viewport: z
+      .tuple([z.number(), z.number()])
+      .describe("Browser width and height"),
+    env: z.record(z.string(), z.string()).describe("Environment variables"),
+  }),
+  { name: "test" },
+);
+
+// $ test login.spec.ts checkout.spec.ts --viewport 1280 720 --env API_URL=http://localhost
+// => {
+//   specs: ["login.spec.ts", "checkout.spec.ts"],
+//   viewport: [1280, 720],
+//   env: { API_URL: "http://localhost" },
+// }
+//
+// $ test --help
+// Usage: test [OPTIONS] [specs]...
+//
+// Arguments:
+//   [specs]...  Test spec files
+//
+// Options:
+//   --viewport <number number>  Browser width and height (required)
+//   --env <string=string>       Environment variables (multi)
+//   --help                      Show this help message
+```
+
 ## Field Metadata
 
 Control how fields map to CLI arguments with [`.meta()`](https://zod.dev/metadata):
