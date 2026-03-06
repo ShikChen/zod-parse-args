@@ -4,6 +4,12 @@ CLI argument parsing with
 [`util.parseArgs`](https://nodejs.org/api/util.html#utilparseargsconfig)
 simplicity and [Zod](https://zod.dev/) type safety.
 
+- Zero dependencies beyond Zod
+- Minimal API: if you know Zod, you already know how to use it
+- Auto-generated `--help` text
+- Subcommands via [`z.discriminatedUnion()`](https://zod.dev/api#discriminated-unions)
+- Built-in type coercion: string args become numbers, booleans, enums, etc.
+
 ## Install
 
 ```bash
