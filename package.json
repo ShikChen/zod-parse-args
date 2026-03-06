@@ -18,7 +18,8 @@
     "url": "git+https://github.com/ShikChen/zod-parse-args.git"
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "type": "module",
   "module": "./dist/index.js",
