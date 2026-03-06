@@ -26,15 +26,16 @@ const { name, times, loud } = parseArgs(
 );
 
 for (let i = 0; i < times; i++) {
-  console.log(loud ? name.toUpperCase() : name);
+  const greeting = `Hello, ${name}!`;
+  console.log(loud ? greeting.toUpperCase() : greeting);
 }
 
 // $ greet --name World --times 3 --loud
 // => { name: "World", times: 3, loud: true }
 //
-// WORLD
-// WORLD
-// WORLD
+// HELLO, WORLD!
+// HELLO, WORLD!
+// HELLO, WORLD!
 //
 // $ greet --help
 // Usage: greet [OPTIONS]
