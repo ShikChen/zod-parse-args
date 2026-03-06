@@ -1,11 +1,16 @@
 {
   "name": "zod-parse-args",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI argument parsing with util.parseArgs simplicity and Zod type safety",
   "keywords": [
     "cli",
-    "parseArgs",
-    "zod"
+    "args",
+    "argument",
+    "parser",
+    "command",
+    "zod",
+    "typescript",
+    "parseArgs"
   ],
   "homepage": "https://github.com/ShikChen/zod-parse-args#readme",
   "bugs": {
