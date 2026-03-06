@@ -8,6 +8,25 @@ import { HelpRequested, ParseError, SchemaError, VersionRequested } from "./erro
 import type { ParseArgsOptions, ParseResult, RootSchema } from "./types.ts";
 export type { ParseArgsOptions, ParseResult, RootSchema } from "./types.ts";
 
+declare module "zod" {
+  interface GlobalMeta {
+    /** Treat this field as a positional argument instead of a named option. */
+    positional?: boolean;
+
+    /** Override the long option name (default: camelCase key converted to kebab-case). */
+    long?: string;
+
+    /** Single-character short alias (e.g. `"f"` for `-f`). */
+    short?: string;
+
+    /** Environment variable name to use as a fallback value. */
+    env?: string;
+
+    /** Placeholder name shown in help text (e.g. show `<SECONDS>` instead of `<number>`). */
+    metavar?: string;
+  }
+}
+
 function handleResult<T>(result: ParseResult<T>): T {
   switch (result.kind) {
     case "ok":
