@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 import { parseArgs } from "zod-parse-args";
 
 const { name, times, loud } = parseArgs(

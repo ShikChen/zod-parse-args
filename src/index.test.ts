@@ -7,7 +7,7 @@ import {
   type RootSchema,
   type ParseArgsOptions,
 } from "./index.ts";
-import { z } from "zod";
+import * as z from "zod";
 import * as zodMini from "zod/mini";
 
 const obj = z.object.bind(z);

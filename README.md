@@ -19,7 +19,7 @@ npm install zod-parse-args zod
 ## Example
 
 ```ts
-import { z } from "zod";
+import * as z from "zod";
 import { parseArgs } from "zod-parse-args";
 
 const { name, times, loud } = parseArgs(
@@ -59,7 +59,7 @@ for (let i = 0; i < times; i++) {
 Use [`z.discriminatedUnion()`](https://zod.dev/api#discriminated-unions) to define subcommands:
 
 ```ts
-import { z } from "zod";
+import * as z from "zod";
 import { parseArgs } from "zod-parse-args";
 
 const args = parseArgs(
@@ -120,7 +120,7 @@ Arrays, tuples, and key-value records map naturally to CLI conventions:
 Here's an example of a test runner that uses all three:
 
 ```ts
-import { z } from "zod";
+import * as z from "zod";
 import { parseArgs } from "zod-parse-args";
 
 const args = parseArgs(
@@ -172,7 +172,7 @@ Control how fields map to CLI arguments with [`.meta()`](https://zod.dev/metadat
 All keys are optional. Here's an example using each one:
 
 ```ts
-import { z } from "zod";
+import * as z from "zod";
 import { parseArgs } from "zod-parse-args";
 
 const args = parseArgs(
