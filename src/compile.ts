@@ -202,37 +202,19 @@ function buildFieldValue(schema: z.$ZodType): FieldSpec["value"] {
   }
 }
 
-function deriveMetavar(schema: z.$ZodType): string[] {
+function isKeyValueSchema(schema: z.$ZodType): boolean {
   const def = getDef(schema);
   switch (def.type) {
-    // primitive
-    case "string":
-    case "number":
-    case "bigint":
-    case "boolean":
-    case "date":
-      return [def.type];
-
-    // enum-like
-    case "literal":
-      return [def.values.map((x) => String(x)).join("|")];
-    case "enum":
-      return [Array.from(getEnumMap(def).keys()).join("|")];
-    case "union":
-      return [def.options.map((x) => deriveMetavar(x).join(" ")).join("|")];
-
-    // container
-    case "tuple":
-      return def.items.flatMap((x) => deriveMetavar(x));
-    case "array":
-      return deriveMetavar(def.element);
-    case "set":
-      return deriveMetavar(def.valueType);
     case "record":
     case "map":
-      return [`${deriveMetavar(def.keyType).join(" ")}=${deriveMetavar(def.valueType).join(" ")}`];
-
-    // wrappers
+      return true;
+    case "union":
+      return def.options.every((x) => isKeyValueSchema(unwrapSchema(x).schema));
+    case "intersection":
+      return (
+        isKeyValueSchema(unwrapSchema(def.left).schema) &&
+        isKeyValueSchema(unwrapSchema(def.right).schema)
+      );
     case "optional":
     case "default":
     case "prefault":
@@ -241,16 +223,31 @@ function deriveMetavar(schema: z.$ZodType): string[] {
     case "nullable":
     case "readonly":
     case "success":
-      return deriveMetavar(def.innerType);
-
+      return isKeyValueSchema(def.innerType);
     case "pipe":
-      const outVar = deriveMetavar(def.out);
-      if (outVar.length !== 1 || outVar[0] !== "value") return outVar;
-      return deriveMetavar(def.in);
-
+      return isKeyValueSchema(def.in);
     default:
-      return ["value"];
+      return false;
   }
+}
+
+function deriveDefaultMetavar(
+  key: string,
+  schema: z.$ZodType,
+  value: FieldValueSpec,
+  positional: boolean,
+): string[] {
+  if (positional) {
+    const label = camelToKebab(key);
+    if (value.kind === "tuple") {
+      return Array.from({ length: value.size }, (_, i) => `${label}-${i + 1}`);
+    }
+    if (value.kind === "array" && isKeyValueSchema(schema)) return ["key=value"];
+    return [label];
+  }
+  if (value.kind === "tuple") return Array(value.size).fill("value");
+  if (value.kind === "array" && isKeyValueSchema(schema)) return ["key=value"];
+  return ["value"];
 }
 
 function addOption(options: FieldMap, field: FieldSpec): void {
@@ -321,7 +318,7 @@ function compileSubcommand(
 }
 
 function normalizeSubcommandMetavar(metavar: FieldMeta["metavar"]): string {
-  if (metavar === null) return "COMMAND";
+  if (metavar === null) return "command";
   if (typeof metavar === "string") return metavar;
   throw new SchemaError("Subcommand metavar must be a string");
 }
@@ -365,8 +362,7 @@ export function compileSchema(schema: z.$ZodType): CommandSpec {
             }
             return value.kind === "tuple" ? Array(value.size).fill(meta.metavar) : [meta.metavar];
           }
-          if (meta.positional) return [key];
-          return deriveMetavar(fieldSchema);
+          return deriveDefaultMetavar(key, inner.schema, value, meta.positional);
         })();
         const fieldSpec = {
           long: meta.long ?? camelToKebab(key),

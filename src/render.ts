@@ -8,7 +8,7 @@ interface HelpItem {
 }
 
 function renderMetavar(labels: string[], brackets: "<>" | "[]"): string {
-  return `${brackets[0]}${labels.join(" ")}${brackets[1]}`;
+  return labels.map((label) => `${brackets[0]}${label}${brackets[1]}`).join(" ");
 }
 
 function wordWrap(text: string, maxWidth: number): string[] {
@@ -42,7 +42,12 @@ function wordWrap(text: string, maxWidth: number): string[] {
 }
 
 function renderPositionalMetavar(field: FieldSpec): string {
-  if (field.value.kind === "array") return `${renderMetavar(field.metavar, "[]")}...`;
+  if (field.value.kind === "array") {
+    return `${renderMetavar(field.metavar, field.optional ? "[]" : "<>")}...`;
+  }
+  if (field.value.kind === "tuple" && field.optional) {
+    return `[${renderMetavar(field.metavar, "<>")}]`;
+  }
   return field.optional ? renderMetavar(field.metavar, "[]") : renderMetavar(field.metavar, "<>");
 }
 
@@ -182,8 +187,10 @@ function resolveLabel(specs: CommandSpec[], path: PropertyKey[]): string {
     for (const field of enumerateOptionFields(spec)) {
       if (field.target === key) return `--${field.long}`;
     }
-    for (const field of spec.positionals) {
-      if (field.target === key) return renderMetavar(field.metavar, "<>");
+    for (const { target, metavar, value } of spec.positionals) {
+      if (target === key) {
+        return `${renderMetavar(metavar, "<>")}${value.kind === "array" ? "..." : ""}`;
+      }
     }
     // Failed to match, the schema might be refinement that provides custom paths.
     break;

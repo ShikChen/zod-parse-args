@@ -47,11 +47,11 @@ for (let i = 0; i < times; i++) {
 // Usage: greet [OPTIONS]
 //
 // Options:
-//   --name <string>   Name to greet (required)
-//   --times <number>  Number of repetitions (default: 1)
-//   --[no-]loud       Print in uppercase
-//   --help            Show this help message
-//   --version         Show version information
+//   --name <value>   Name to greet (required)
+//   --times <value>  Number of repetitions (default: 1)
+//   --[no-]loud      Print in uppercase
+//   --help           Show this help message
+//   --version        Show version information
 ```
 
 ## Subcommands
@@ -89,7 +89,7 @@ const args = parseArgs(
 // => { command: "build", outDir: "dist", minify: true }
 //
 // $ app --help
-// Usage: app [OPTIONS] <COMMAND>
+// Usage: app [OPTIONS] <command>
 //
 // Commands:
 //   serve  Start dev server
@@ -104,9 +104,9 @@ const args = parseArgs(
 // Usage: app build [OPTIONS]
 //
 // Options:
-//   --out-dir <string>  Output directory (default: "dist")
-//   --[no-]minify       Minify output
-//   --help              Show this help message
+//   --out-dir <value>  Output directory (default: "dist")
+//   --[no-]minify      Minify output
+//   --help             Show this help message
 ```
 
 ## Collection Types
@@ -152,9 +152,9 @@ const args = parseArgs(
 //   [specs]...  Test spec files
 //
 // Options:
-//   --viewport <width height>  Browser width and height (required)
-//   --env <string=string>       Environment variables (multi)
-//   --help                      Show this help message
+//   --viewport <width> <height>  Browser width and height (required)
+//   --env <key=value>            Environment variables (multi)
+//   --help                       Show this help message
 ```
 
 ## Field Metadata
@@ -191,7 +191,7 @@ const args = parseArgs(
       description: "Authentication token",
     }),
     timeout: z.number().default(30).meta({
-      metavar: "SECONDS",
+      metavar: "seconds",
       description: "Deploy timeout",
     }),
     force: z.boolean().meta({
@@ -215,9 +215,9 @@ const args = parseArgs(
 //   <source>  Directory to deploy
 //
 // Options:
-//   --env <dev|prod>     Target environment (required)
-//   --token <string>     Authentication token (env: DEPLOY_TOKEN) (required)
-//   --timeout <SECONDS>  Deploy timeout (default: 30)
+//   --env <value>        Target environment (required)
+//   --token <value>      Authentication token (env: DEPLOY_TOKEN) (required)
+//   --timeout <seconds>  Deploy timeout (default: 30)
 //   -f, --[no-]force     Skip confirmation prompt
 //   --help               Show this help message
 ```

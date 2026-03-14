@@ -1,9 +1,13 @@
 import { repr } from "./util.ts";
 import { HelpRequested, ParseError, VersionRequested } from "./errors.ts";
-import type { CommandSpec, SubcommandSpec, Token } from "./types.ts";
+import type { CommandSpec, FieldSpec, SubcommandSpec, Token } from "./types.ts";
 
 function formatAvailableCommands(sub: SubcommandSpec): string {
   return sub.variants.map((v) => v.values[0]).join(", ");
+}
+
+function formatPositionalLabel(field: FieldSpec): string {
+  return field.metavar.map((label) => `<${label}>`).join(" ");
 }
 
 class Tokenizer {
@@ -140,7 +144,7 @@ class Tokenizer {
     const field = this.spec.positionals[this.posCount];
     if (field.value.kind !== "array") this.posCount++;
     if (field.value.kind === "tuple") {
-      const value = this.consumeTupleArgs(`<${field.target}>`, field.value.size);
+      const value = this.consumeTupleArgs(formatPositionalLabel(field), field.value.size);
       this.tokens.push({ kind: "positional", field, value });
     } else {
       const value = this.args[this.idx++];

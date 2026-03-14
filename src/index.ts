@@ -22,7 +22,7 @@ declare module "zod" {
     /** Environment variable name to use as a fallback value. */
     env?: string;
 
-    /** Placeholder name shown in help text (e.g. show `<SECONDS>` instead of `<number>`). */
+    /** Placeholder name shown in help text (e.g. show `<seconds>` instead of `<value>`). */
     metavar?: string | readonly string[];
   }
 }

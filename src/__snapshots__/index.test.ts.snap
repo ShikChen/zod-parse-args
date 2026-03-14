@@ -3,7 +3,7 @@
 exports[`help 1`] = `
 "A simple key-value store
 
-Usage: test [OPTIONS] <COMMAND>
+Usage: test [OPTIONS] <command>
 
 Commands:
   get  Get a value
@@ -20,8 +20,8 @@ exports[`help 2`] = `
 Usage: test get [OPTIONS]
 
 Options:
-  --key <string>  Key to look up (required)
-  --help          Show this help message"
+  --key <value>  Key to look up (required)
+  --help         Show this help message"
 `;
 
 exports[`help 3`] = `
@@ -30,7 +30,7 @@ exports[`help 3`] = `
 Usage: test set [OPTIONS]
 
 Options:
-  --key <string>    Key to update (required)
-  --value <number>  Value to store (required)
-  --help            Show this help message"
+  --key <value>    Key to update (required)
+  --value <value>  Value to store (required)
+  --help           Show this help message"
 `;

@@ -251,7 +251,12 @@ test("help", () => {
     expect(res.kind).toBe("help");
     return res.kind === "help" ? res.help : "";
   }
-  expectHelp(obj({ name: z.string() }), ["--help"], "--name <string>");
+  expectHelp(obj({ name: z.string() }), ["--help"], "--name <value>");
+  expectHelp(
+    obj({ size: z.tuple([z.number(), z.number()]) }),
+    ["--help"],
+    "--size <value> <value>",
+  );
   expectHelp(
     obj({
       size: z.tuple([z.number(), z.number()]).meta({
@@ -259,8 +264,28 @@ test("help", () => {
       }),
     }),
     ["--help"],
-    "--size <width height>",
+    "--size <width> <height>",
   );
+  expectHelp(
+    obj({ sourcePath: z.string().meta({ positional: true }) }),
+    ["--help"],
+    "<source-path>",
+  );
+  expectHelp(
+    obj({
+      range: z.tuple([z.number(), z.number()]).optional().meta({ positional: true }),
+    }),
+    ["--help"],
+    "[<range-1> <range-2>]",
+  );
+  expectHelp(
+    obj({
+      envVars: z.record(z.string(), z.string()).meta({ positional: true }),
+    }),
+    ["--help"],
+    "[key=value]...",
+  );
+  expectHelp(obj({ env: z.record(z.string(), z.string()) }), ["--help"], "--env <key=value>");
   expectOk(obj({ help: z.boolean() }), ["--help"], { help: true });
   expect(parse(kvStoreSchema)).toMatchSnapshot();
   expect(parse(kvStoreSchema, ["get", "--help"])).toMatchSnapshot();
@@ -298,7 +323,7 @@ test("parseArgs", () => {
     }
     expect(exit).toHaveBeenCalledWith(code);
   }
-  check(["--help"], "--name <string>", null, 0);
+  check(["--help"], "--name <value>", null, 0);
   check({ args: ["--version"], version: "1.2.3" }, "1.2.3", null, 0);
   check(["--name"], "Usage:", "--name: Missing value", 1);
 });
