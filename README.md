@@ -129,9 +129,10 @@ const args = parseArgs(
       positional: true,
       description: "Test spec files",
     }),
-    viewport: z
-      .tuple([z.number(), z.number()])
-      .describe("Browser width and height"),
+    viewport: z.tuple([z.number(), z.number()]).meta({
+      metavar: ["width", "height"],
+      description: "Browser width and height",
+    }),
     env: z.record(z.string(), z.string()).describe("Environment variables"),
   }),
   { name: "test" },
@@ -151,7 +152,7 @@ const args = parseArgs(
 //   [specs]...  Test spec files
 //
 // Options:
-//   --viewport <number number>  Browser width and height (required)
+//   --viewport <width height>  Browser width and height (required)
 //   --env <string=string>       Environment variables (multi)
 //   --help                      Show this help message
 ```
@@ -160,14 +161,14 @@ const args = parseArgs(
 
 Control how fields map to CLI arguments with [`.meta()`](https://zod.dev/metadata):
 
-| Key           | Type      | Description                                                |
-| ------------- | --------- | ---------------------------------------------------------- |
-| `positional`  | `boolean` | Positional argument                                        |
-| `long`        | `string`  | Override long option name                                  |
-| `short`       | `string`  | Single-character short alias                               |
-| `env`         | `string`  | Environment variable fallback                              |
-| `metavar`     | `string`  | Custom placeholder in help text                            |
-| `description` | `string`  | Same as [`.describe()`](https://zod.dev/metadata#describe) |
+| Key           | Type                 | Description                                                |
+| ------------- | -------------------- | ---------------------------------------------------------- |
+| `positional`  | `boolean`            | Positional argument                                        |
+| `long`        | `string`             | Override long option name                                  |
+| `short`       | `string`             | Single-character short alias                               |
+| `env`         | `string`             | Environment variable fallback                              |
+| `metavar`     | `string \| string[]` | Custom placeholder(s) in help text                         |
+| `description` | `string`             | Same as [`.describe()`](https://zod.dev/metadata#describe) |
 
 All keys are optional. Here's an example using each one:
 

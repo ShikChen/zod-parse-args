@@ -42,7 +42,7 @@ export interface FieldMeta {
   long: string | null;
   short: string | null;
   positional: boolean;
-  metavar: string | null;
+  metavar: string | string[] | null;
   env: string | null;
   description: string | null;
 }

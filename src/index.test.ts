@@ -252,6 +252,15 @@ test("help", () => {
     return res.kind === "help" ? res.help : "";
   }
   expectHelp(obj({ name: z.string() }), ["--help"], "--name <string>");
+  expectHelp(
+    obj({
+      size: z.tuple([z.number(), z.number()]).meta({
+        metavar: ["width", "height"],
+      }),
+    }),
+    ["--help"],
+    "--size <width height>",
+  );
   expectOk(obj({ help: z.boolean() }), ["--help"], { help: true });
   expect(parse(kvStoreSchema)).toMatchSnapshot();
   expect(parse(kvStoreSchema, ["get", "--help"])).toMatchSnapshot();
@@ -356,7 +365,10 @@ test("schema error", () => {
   bad(obj({ foo: z.literal([1, "1"]) }));
   bad(obj({ foo: z.string(), bar: z.string().meta({ long: "foo" }) }));
   bad(obj({ foo: z.tuple([z.string(), z.string()]).meta({ env: "FOO" }) }));
+  bad(obj({ foo: z.string().meta({ metavar: ["value"] }) }));
+  bad(obj({ foo: z.tuple([z.int(), z.int()]).meta({ metavar: ["x"] }) }));
   bad(obj({ foo: z.tuple([z.int()], z.string()) }));
+  bad(kvStoreSchema.meta({ metavar: ["command"] }));
   bad(obj({ kv1: kvStoreSchema, kv2: kvStoreSchema }));
   const posIntArray = z.int().array().meta({ positional: true });
   bad(obj({ a1: posIntArray, a2: posIntArray }));

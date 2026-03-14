@@ -39,7 +39,7 @@ function getFieldMeta(schema: z.$ZodType): FieldMeta {
     long: stringOrNull(long),
     short: stringOrNull(short),
     positional: positional === true,
-    metavar: stringOrNull(metavar),
+    metavar: typeof metavar === "string" ? metavar : isStringArray(metavar) ? [...metavar] : null,
     env: stringOrNull(env),
     description: stringOrNull(description),
   };
@@ -70,7 +70,7 @@ function assertNoOptionMeta(
   for (const prop of ["long", "short", "env", "metavar"] as const) {
     if (allowed.includes(prop)) continue;
     if (meta[prop] !== null) {
-      throw new SchemaError(`Unsupported metadata on ${context}: ${prop}=${meta[prop]}`);
+      throw new SchemaError(`Unsupported metadata on ${context}: ${prop}=${repr(meta[prop])}`);
     }
   }
   return meta;
@@ -320,6 +320,12 @@ function compileSubcommand(
   return { key, discriminator: def.discriminator, variants, optional, metavar };
 }
 
+function normalizeSubcommandMetavar(metavar: FieldMeta["metavar"]): string {
+  if (metavar === null) return "COMMAND";
+  if (typeof metavar === "string") return metavar;
+  throw new SchemaError("Subcommand metavar must be a string");
+}
+
 export function compileSchema(schema: z.$ZodType): CommandSpec {
   const inner = unwrapSchema(schema);
   const def = getDef(inner.schema);
@@ -339,13 +345,26 @@ export function compileSchema(schema: z.$ZodType): CommandSpec {
           key,
           inner.schema as z.$ZodDiscriminatedUnion,
           inner.optional,
-          meta.metavar ?? "COMMAND",
+          normalizeSubcommandMetavar(meta.metavar),
         );
       } else {
         const meta = getFieldMeta(fieldSchema);
         const value = buildFieldValue(inner.schema);
         const metavar = (() => {
-          if (meta.metavar !== null) return [meta.metavar];
+          if (meta.metavar !== null) {
+            if (Array.isArray(meta.metavar)) {
+              if (value.kind !== "tuple") {
+                throw new SchemaError("Array metavar is only supported for tuple fields");
+              }
+              if (meta.metavar.length !== value.size) {
+                throw new SchemaError(
+                  `Tuple metavar must have exactly ${value.size} items, got ${meta.metavar.length}`,
+                );
+              }
+              return [...meta.metavar];
+            }
+            return value.kind === "tuple" ? Array(value.size).fill(meta.metavar) : [meta.metavar];
+          }
           if (meta.positional) return [key];
           return deriveMetavar(fieldSchema);
         })();
@@ -402,7 +421,7 @@ export function compileSchema(schema: z.$ZodType): CommandSpec {
       null,
       inner.schema as z.$ZodDiscriminatedUnion,
       inner.optional,
-      metavar ?? "COMMAND",
+      normalizeSubcommandMetavar(metavar),
     );
     const spec = {
       options: new Map(),
