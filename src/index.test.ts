@@ -286,6 +286,20 @@ test("help", () => {
     "[key=value]...",
   );
   expectHelp(obj({ env: z.record(z.string(), z.string()) }), ["--help"], "--env <key=value>");
+  expectHelp(obj({ env: z.enum(["dev", "prod"]) }), ["--help"], "(choices: dev, prod)");
+  expectHelp(obj({ env: z.literal(["dev", "prod"]) }), ["--help"], "(choices: dev, prod)");
+  expectHelp(
+    obj({ env: z.union([z.literal("dev"), z.literal("prod")]) }),
+    ["--help"],
+    "(choices: dev, prod)",
+  );
+  expectHelp(
+    obj({ env: z.intersection(z.enum(["a", "b", "c"]), z.enum(["b", "c", "d"])) }),
+    ["--help"],
+    "(choices: b, c)",
+  );
+  expectHelp(obj({ tag: z.array(z.enum(["a", "b"])) }), ["--help"], "(choices: a, b)");
+  expectHelp(obj({ tag: z.set(z.enum(["a", "b"])) }), ["--help"], "(choices: a, b)");
   expectOk(obj({ help: z.boolean() }), ["--help"], { help: true });
   expect(parse(kvStoreSchema)).toMatchSnapshot();
   expect(parse(kvStoreSchema, ["get", "--help"])).toMatchSnapshot();

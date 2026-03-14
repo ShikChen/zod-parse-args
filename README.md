@@ -215,7 +215,7 @@ const args = parseArgs(
 //   <source>  Directory to deploy
 //
 // Options:
-//   --env <value>        Target environment (required)
+//   --env <value>        Target environment (choices: dev, prod) (required)
 //   --token <value>      Authentication token (env: DEPLOY_TOKEN) (required)
 //   --timeout <seconds>  Deploy timeout (default: 30)
 //   -f, --[no-]force     Skip confirmation prompt

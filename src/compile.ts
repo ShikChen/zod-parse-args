@@ -250,6 +250,43 @@ function deriveDefaultMetavar(
   return ["value"];
 }
 
+function deriveChoices(schema: z.$ZodType): string[] | null {
+  const def = getDef(schema);
+  switch (def.type) {
+    case "literal":
+      return def.values.map((x) => String(x));
+    case "enum":
+      return Array.from(getEnumMap(def).keys());
+    case "array":
+      return deriveChoices(def.element);
+    case "set":
+      return deriveChoices(def.valueType);
+    case "union":
+      const options = def.options.map((x) => deriveChoices(unwrapSchema(x).schema));
+      if (options.some((x) => x === null)) return null;
+      return Array.from(new Set(options.flatMap((x) => x ?? [])));
+    case "intersection":
+      const left = deriveChoices(unwrapSchema(def.left).schema);
+      const right = deriveChoices(unwrapSchema(def.right).schema);
+      if (left === null || right === null) return null;
+      const rightSet = new Set(right);
+      return left.filter((choice) => rightSet.has(choice));
+    case "optional":
+    case "default":
+    case "prefault":
+    case "nonoptional":
+    case "catch":
+    case "nullable":
+    case "readonly":
+    case "success":
+      return deriveChoices(def.innerType);
+    case "pipe":
+      return deriveChoices(def.in);
+    default:
+      return null;
+  }
+}
+
 function addOption(options: FieldMap, field: FieldSpec): void {
   function doSet(key: string) {
     if (options.has(key)) {
@@ -368,6 +405,7 @@ export function compileSchema(schema: z.$ZodType): CommandSpec {
           long: meta.long ?? camelToKebab(key),
           short: meta.short,
           metavar: metavar,
+          choices: deriveChoices(inner.schema),
           env: meta.env,
           description: meta.description,
           target: key,

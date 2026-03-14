@@ -57,6 +57,7 @@ export interface FieldSpec {
   long: string;
   short: string | null;
   metavar: string[];
+  choices: string[] | null;
   env: string | null;
   description: string | null;
   target: string;

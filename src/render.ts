@@ -150,6 +150,7 @@ export function renderHelp(spec: CommandSpec, opts: ParseArgsOptions): string {
     ].join(" ");
     const desc = [];
     if (opt.description !== null) desc.push(opt.description);
+    if (opt.choices !== null) desc.push(`(choices: ${opt.choices.join(", ")})`);
     if (opt.value.kind === "array") desc.push("(multi)");
     if (opt.env !== null) desc.push(`(env: ${opt.env})`);
     if (opt.defaultValue !== undefined) desc.push(`(default: ${repr(opt.defaultValue)})`);
