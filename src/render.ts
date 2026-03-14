@@ -7,6 +7,10 @@ interface HelpItem {
   description: string;
 }
 
+function renderMetavar(labels: string[], brackets: "<>" | "[]"): string {
+  return `${brackets[0]}${labels.join(" ")}${brackets[1]}`;
+}
+
 function wordWrap(text: string, maxWidth: number): string[] {
   // TODO: Handle ascii escape codes with colors.
   // TODO: Handle CJK characters that are wider than 1 column.
@@ -38,8 +42,8 @@ function wordWrap(text: string, maxWidth: number): string[] {
 }
 
 function renderPositionalMetavar(field: FieldSpec): string {
-  if (field.value.kind === "array") return `[${field.metavar}]...`;
-  return field.optional ? `[${field.metavar}]` : `<${field.metavar}>`;
+  if (field.value.kind === "array") return `${renderMetavar(field.metavar, "[]")}...`;
+  return field.optional ? renderMetavar(field.metavar, "[]") : renderMetavar(field.metavar, "<>");
 }
 
 function renderCommandPath(spec: CommandSpec): string {
@@ -137,7 +141,7 @@ export function renderHelp(spec: CommandSpec, opts: ParseArgsOptions): string {
     const long = opt.value.kind === "bool" ? `[no-]${opt.long}` : `${opt.long}`;
     const label = [
       opt.short !== null ? `-${opt.short}, --${long}` : `--${long}`,
-      opt.value.kind !== "bool" ? `<${opt.metavar}>` : "",
+      opt.value.kind !== "bool" ? renderMetavar(opt.metavar, "<>") : "",
     ].join(" ");
     const desc = [];
     if (opt.description !== null) desc.push(opt.description);
@@ -179,7 +183,7 @@ function resolveLabel(specs: CommandSpec[], path: PropertyKey[]): string {
       if (field.target === key) return `--${field.long}`;
     }
     for (const field of spec.positionals) {
-      if (field.target === key) return `<${field.metavar}>`;
+      if (field.target === key) return renderMetavar(field.metavar, "<>");
     }
     // Failed to match, the schema might be refinement that provides custom paths.
     break;

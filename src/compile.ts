@@ -202,7 +202,7 @@ function buildFieldValue(schema: z.$ZodType): FieldSpec["value"] {
   }
 }
 
-function deriveMetavar(schema: z.$ZodType): string {
+function deriveMetavar(schema: z.$ZodType): string[] {
   const def = getDef(schema);
   switch (def.type) {
     // primitive
@@ -211,26 +211,26 @@ function deriveMetavar(schema: z.$ZodType): string {
     case "bigint":
     case "boolean":
     case "date":
-      return def.type;
+      return [def.type];
 
     // enum-like
     case "literal":
-      return def.values.map((x) => String(x)).join("|");
+      return [def.values.map((x) => String(x)).join("|")];
     case "enum":
-      return Array.from(getEnumMap(def).keys()).join("|");
+      return [Array.from(getEnumMap(def).keys()).join("|")];
     case "union":
-      return def.options.map((x) => deriveMetavar(x)).join("|");
+      return [def.options.map((x) => deriveMetavar(x).join(" ")).join("|")];
 
     // container
     case "tuple":
-      return def.items.map((x) => deriveMetavar(x)).join(" ");
+      return def.items.flatMap((x) => deriveMetavar(x));
     case "array":
       return deriveMetavar(def.element);
     case "set":
       return deriveMetavar(def.valueType);
     case "record":
     case "map":
-      return `${deriveMetavar(def.keyType)}=${deriveMetavar(def.valueType)}`;
+      return [`${deriveMetavar(def.keyType).join(" ")}=${deriveMetavar(def.valueType).join(" ")}`];
 
     // wrappers
     case "optional":
@@ -245,11 +245,11 @@ function deriveMetavar(schema: z.$ZodType): string {
 
     case "pipe":
       const outVar = deriveMetavar(def.out);
-      if (outVar !== "value") return outVar;
+      if (outVar.length !== 1 || outVar[0] !== "value") return outVar;
       return deriveMetavar(def.in);
 
     default:
-      return "value";
+      return ["value"];
   }
 }
 
@@ -345,8 +345,8 @@ export function compileSchema(schema: z.$ZodType): CommandSpec {
         const meta = getFieldMeta(fieldSchema);
         const value = buildFieldValue(inner.schema);
         const metavar = (() => {
-          if (meta.metavar !== null) return meta.metavar;
-          if (meta.positional) return key;
+          if (meta.metavar !== null) return [meta.metavar];
+          if (meta.positional) return [key];
           return deriveMetavar(fieldSchema);
         })();
         const fieldSpec = {

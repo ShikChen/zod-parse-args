@@ -56,7 +56,7 @@ export type FieldValueSpec =
 export interface FieldSpec {
   long: string;
   short: string | null;
-  metavar: string;
+  metavar: string[];
   env: string | null;
   description: string | null;
   target: string;
