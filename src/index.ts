@@ -23,7 +23,7 @@ declare module "zod" {
     env?: string;
 
     /** Placeholder name shown in help text (e.g. show `<SECONDS>` instead of `<number>`). */
-    metavar?: string;
+    metavar?: string | string[];
   }
 }
 

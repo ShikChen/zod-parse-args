@@ -17,7 +17,7 @@ export interface ParseArgsOptions {
   version?: string;
 
   /** Arguments to parse. Defaults to `process.argv.slice(2)`. */
-  args?: string[];
+  args?: readonly string[];
 
   /** Environment variables for `env` fallbacks. Defaults to `process.env`. */
   env?: Record<string, string | undefined>;

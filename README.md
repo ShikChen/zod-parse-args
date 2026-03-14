@@ -234,7 +234,7 @@ interface ParseArgsOptions {
   version?: string;
 
   // Arguments to parse (default: process.argv.slice(2))
-  args?: string[];
+  args?: readonly string[];
 
   // Environment variables (default: process.env)
   env?: Record<string, string | undefined>;

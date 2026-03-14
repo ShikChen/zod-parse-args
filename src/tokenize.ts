@@ -14,7 +14,7 @@ class Tokenizer {
 
   private constructor(
     private spec: CommandSpec,
-    private args: string[],
+    private args: readonly string[],
   ) {}
 
   private consumeTupleArgs(label: string, size: number): string[] {
@@ -205,12 +205,12 @@ class Tokenizer {
     return this.tokens;
   }
 
-  static run(spec: CommandSpec, args: string[]): Token[] {
+  static run(spec: CommandSpec, args: readonly string[]): Token[] {
     const tokenizer = new Tokenizer(spec, args);
     return tokenizer.tokenizeAll();
   }
 }
 
-export function tokenize(spec: CommandSpec, args: string[]): Token[] {
+export function tokenize(spec: CommandSpec, args: readonly string[]): Token[] {
   return Tokenizer.run(spec, args);
 }
