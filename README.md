@@ -153,7 +153,7 @@ const args = parseArgs(
 //
 // Options:
 //   --viewport <width> <height>  Browser width and height (required)
-//   --env <key=value>            Environment variables (multi)
+//   --env <key=value>            Environment variables (repeatable)
 //   --help                       Show this help message
 ```
 
