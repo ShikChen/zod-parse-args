@@ -11,6 +11,7 @@ import {
   unwrapSchema,
 } from "./util.ts";
 import { SchemaError } from "./errors.ts";
+import { deriveMetavar, getMetavar, normalizeSubcommandMetavar } from "./metavar.ts";
 import type {
   CommandSpec,
   FieldMap,
@@ -30,13 +31,6 @@ function validateOptionName(name: string): void {
   if (/[=\s]/.test(name)) {
     throw new SchemaError("Option name cannot contain spaces or equals");
   }
-}
-
-function getMetavar(schema: z.$ZodType): string | string[] | null {
-  const { metavar } = z.globalRegistry.get(schema) ?? {};
-  if (typeof metavar === "string") return metavar;
-  if (isStringArray(metavar)) return [...metavar];
-  return null;
 }
 
 function getFieldMeta(schema: z.$ZodType): FieldMeta {
@@ -209,92 +203,6 @@ function buildFieldValue(schema: z.$ZodType): FieldSpec["value"] {
   }
 }
 
-function isKeyValueSchema(schema: z.$ZodType): boolean {
-  const def = getDef(schema);
-  switch (def.type) {
-    case "record":
-    case "map":
-      return true;
-    case "union":
-      return def.options.every((x) => isKeyValueSchema(unwrapSchema(x).schema));
-    case "intersection":
-      return (
-        isKeyValueSchema(unwrapSchema(def.left).schema) &&
-        isKeyValueSchema(unwrapSchema(def.right).schema)
-      );
-    case "optional":
-    case "default":
-    case "prefault":
-    case "nonoptional":
-    case "catch":
-    case "nullable":
-    case "readonly":
-    case "success":
-      return isKeyValueSchema(def.innerType);
-    case "pipe":
-      return isKeyValueSchema(def.in);
-    default:
-      return false;
-  }
-}
-
-function getStringMetavar(schema: z.$ZodType): string | null {
-  const metavar = getMetavar(schema);
-  return typeof metavar === "string" ? metavar : null;
-}
-
-function deriveMetavar(
-  key: string,
-  schema: z.$ZodType,
-  value: FieldValueSpec,
-  meta: FieldMeta,
-): string[] {
-  const { positional, metavar } = meta;
-  if (metavar !== null) {
-    if (Array.isArray(metavar)) {
-      if (value.kind !== "tuple") {
-        throw new SchemaError("Array metavar is only supported for tuple fields");
-      }
-      if (metavar.length !== value.size) {
-        throw new SchemaError(
-          `Tuple metavar must have exactly ${value.size} items, got ${metavar.length}`,
-        );
-      }
-      return [...metavar];
-    }
-    return value.kind === "tuple" ? Array(value.size).fill(metavar) : [metavar];
-  }
-
-  const def = getDef(schema);
-  const label = camelToKebab(key);
-  const scalarFallback = positional ? label : "value";
-
-  if (value.kind === "tuple") {
-    if (def.type === "tuple") {
-      const items = def.items.map(getStringMetavar);
-      if (items.every((item) => item !== null)) return items;
-      if (!positional && items.some((item) => item !== null))
-        return items.map((item) => item ?? "value");
-    }
-    return positional
-      ? Array.from({ length: value.size }, (_, i) => `${label}-${i + 1}`)
-      : Array(value.size).fill(scalarFallback);
-  }
-
-  if (value.kind === "array") {
-    if (def.type === "array") return [getStringMetavar(def.element) ?? scalarFallback];
-    if (def.type === "set") return [getStringMetavar(def.valueType) ?? scalarFallback];
-    if (def.type === "map" || def.type === "record") {
-      const keyMetavar = getStringMetavar(def.keyType) ?? "key";
-      const valueMetavar = getStringMetavar(def.valueType) ?? "value";
-      return [`${keyMetavar}=${valueMetavar}`];
-    }
-    return isKeyValueSchema(schema) ? ["key=value"] : [scalarFallback];
-  }
-
-  return [scalarFallback];
-}
-
 function deriveChoices(schema: z.$ZodType): string[] | null {
   const def = getDef(schema);
   switch (def.type) {
@@ -397,12 +305,6 @@ function compileSubcommand(
     variants.push({ values, spec });
   }
   return { key, discriminator: def.discriminator, variants, optional, metavar };
-}
-
-function normalizeSubcommandMetavar(metavar: FieldMeta["metavar"]): string {
-  if (metavar === null) return "command";
-  if (typeof metavar === "string") return metavar;
-  throw new SchemaError("Subcommand metavar must be a string");
 }
 
 export function compileSchema(schema: z.$ZodType): CommandSpec {
