@@ -32,14 +32,21 @@ function validateOptionName(name: string): void {
   }
 }
 
+function getMetavar(schema: z.$ZodType): string | string[] | null {
+  const { metavar } = z.globalRegistry.get(schema) ?? {};
+  if (typeof metavar === "string") return metavar;
+  if (isStringArray(metavar)) return [...metavar];
+  return null;
+}
+
 function getFieldMeta(schema: z.$ZodType): FieldMeta {
-  const { long, short, positional, metavar, env, description } = z.globalRegistry.get(schema) ?? {};
+  const { long, short, positional, env, description } = z.globalRegistry.get(schema) ?? {};
   const stringOrNull = (x: unknown) => (typeof x === "string" ? x : null);
   const meta: FieldMeta = {
     long: stringOrNull(long),
     short: stringOrNull(short),
     positional: positional === true,
-    metavar: typeof metavar === "string" ? metavar : isStringArray(metavar) ? [...metavar] : null,
+    metavar: getMetavar(schema),
     env: stringOrNull(env),
     description: stringOrNull(description),
   };
@@ -231,23 +238,61 @@ function isKeyValueSchema(schema: z.$ZodType): boolean {
   }
 }
 
-function deriveDefaultMetavar(
+function getStringMetavar(schema: z.$ZodType): string | null {
+  const metavar = getMetavar(schema);
+  return typeof metavar === "string" ? metavar : null;
+}
+
+function deriveMetavar(
   key: string,
   schema: z.$ZodType,
   value: FieldValueSpec,
-  positional: boolean,
+  meta: FieldMeta,
 ): string[] {
-  if (positional) {
-    const label = camelToKebab(key);
-    if (value.kind === "tuple") {
-      return Array.from({ length: value.size }, (_, i) => `${label}-${i + 1}`);
+  const { positional, metavar } = meta;
+  if (metavar !== null) {
+    if (Array.isArray(metavar)) {
+      if (value.kind !== "tuple") {
+        throw new SchemaError("Array metavar is only supported for tuple fields");
+      }
+      if (metavar.length !== value.size) {
+        throw new SchemaError(
+          `Tuple metavar must have exactly ${value.size} items, got ${metavar.length}`,
+        );
+      }
+      return [...metavar];
     }
-    if (value.kind === "array" && isKeyValueSchema(schema)) return ["key=value"];
-    return [label];
+    return value.kind === "tuple" ? Array(value.size).fill(metavar) : [metavar];
   }
-  if (value.kind === "tuple") return Array(value.size).fill("value");
-  if (value.kind === "array" && isKeyValueSchema(schema)) return ["key=value"];
-  return ["value"];
+
+  const def = getDef(schema);
+  const label = camelToKebab(key);
+  const scalarFallback = positional ? label : "value";
+
+  if (value.kind === "tuple") {
+    if (def.type === "tuple") {
+      const items = def.items.map(getStringMetavar);
+      if (items.every((item) => item !== null)) return items;
+      if (!positional && items.some((item) => item !== null))
+        return items.map((item) => item ?? "value");
+    }
+    return positional
+      ? Array.from({ length: value.size }, (_, i) => `${label}-${i + 1}`)
+      : Array(value.size).fill(scalarFallback);
+  }
+
+  if (value.kind === "array") {
+    if (def.type === "array") return [getStringMetavar(def.element) ?? scalarFallback];
+    if (def.type === "set") return [getStringMetavar(def.valueType) ?? scalarFallback];
+    if (def.type === "map" || def.type === "record") {
+      const keyMetavar = getStringMetavar(def.keyType) ?? "key";
+      const valueMetavar = getStringMetavar(def.valueType) ?? "value";
+      return [`${keyMetavar}=${valueMetavar}`];
+    }
+    return isKeyValueSchema(schema) ? ["key=value"] : [scalarFallback];
+  }
+
+  return [scalarFallback];
 }
 
 function deriveChoices(schema: z.$ZodType): string[] | null {
@@ -384,27 +429,10 @@ export function compileSchema(schema: z.$ZodType): CommandSpec {
       } else {
         const meta = getFieldMeta(fieldSchema);
         const value = buildFieldValue(inner.schema);
-        const metavar = (() => {
-          if (meta.metavar !== null) {
-            if (Array.isArray(meta.metavar)) {
-              if (value.kind !== "tuple") {
-                throw new SchemaError("Array metavar is only supported for tuple fields");
-              }
-              if (meta.metavar.length !== value.size) {
-                throw new SchemaError(
-                  `Tuple metavar must have exactly ${value.size} items, got ${meta.metavar.length}`,
-                );
-              }
-              return [...meta.metavar];
-            }
-            return value.kind === "tuple" ? Array(value.size).fill(meta.metavar) : [meta.metavar];
-          }
-          return deriveDefaultMetavar(key, inner.schema, value, meta.positional);
-        })();
         const fieldSpec = {
           long: meta.long ?? camelToKebab(key),
           short: meta.short,
-          metavar: metavar,
+          metavar: deriveMetavar(key, inner.schema, value, meta),
           choices: deriveChoices(inner.schema),
           env: meta.env,
           description: meta.description,

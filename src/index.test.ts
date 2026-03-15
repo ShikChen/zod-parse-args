@@ -267,6 +267,67 @@ test("help", () => {
     "--size <width> <height>",
   );
   expectHelp(
+    obj({
+      size: z.tuple([z.number(), z.string().meta({ metavar: "unit" })]),
+    }),
+    ["--help"],
+    "--size <value> <unit>",
+  );
+  expectHelp(
+    obj({
+      size: z.tuple([z.number(), z.string().meta({ metavar: "unit" })]).meta({ positional: true }),
+    }),
+    ["--help"],
+    "<size-1> <size-2>",
+  );
+  expectHelp(
+    obj({
+      range: z
+        .tuple([z.string().meta({ metavar: "start" }), z.string().meta({ metavar: "end" })])
+        .meta({ positional: true }),
+    }),
+    ["--help"],
+    "<start> <end>",
+  );
+  expectHelp(
+    obj({
+      range: z
+        .tuple([z.string().meta({ metavar: "start" }), z.string().meta({ metavar: "end" })])
+        .optional(),
+    }),
+    ["--help"],
+    "--range <start> <end>",
+  );
+  expectHelp(
+    obj({
+      range: z
+        .tuple([z.string().meta({ metavar: "start" }), z.string().meta({ metavar: "end" })])
+        .optional()
+        .meta({ metavar: ["from", "to"] }),
+    }),
+    ["--help"],
+    "--range <from> <to>",
+  );
+  expectHelp(
+    obj({ files: z.array(z.string().meta({ metavar: "file" })) }),
+    ["--help"],
+    "--files <file>",
+  );
+  expectHelp(
+    obj({
+      env: z.record(z.string().meta({ metavar: "name" }), z.string().meta({ metavar: "path" })),
+    }),
+    ["--help"],
+    "--env <name=path>",
+  );
+  expectHelp(
+    obj({
+      files: z.array(z.union([z.string().meta({ metavar: "file" }), z.literal("stdin")])),
+    }),
+    ["--help"],
+    "--files <value>",
+  );
+  expectHelp(
     obj({ sourcePath: z.string().meta({ positional: true }) }),
     ["--help"],
     "<source-path>",
