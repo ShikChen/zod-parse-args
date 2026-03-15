@@ -1,4 +1,4 @@
-import { test, expect, vi } from "vitest";
+import { assertType, expect, test, vi } from "vitest";
 import {
   parseArgs,
   safeParseArgs,
@@ -483,4 +483,18 @@ test("zod mini", () => {
   expectOk(z.object({ name: z.string() }), ["--name", "Amy"], { name: "Amy" });
   expectOk(z.object({ age: z.number() }), ["--age", "18"], { age: 18 });
   expectOk(z.object({ name: z.string().check(z.trim()) }), ["--name", "Amy "], { name: "Amy" });
+});
+
+test("types", () => {
+  assertType<ParseArgsOptions>({ args: ["--help"] as const });
+
+  expectOk(
+    obj({
+      size: z.tuple([z.number(), z.number()]).meta({
+        metavar: ["width", "height"] as const,
+      }),
+    }),
+    ["--size", "640", "360"],
+    { size: [640, 360] },
+  );
 });
