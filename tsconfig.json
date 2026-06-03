@@ -35,5 +35,5 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "exclude": ["e2e"]
+  "include": ["src/"]
 }
