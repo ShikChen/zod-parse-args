@@ -8,7 +8,7 @@ import { HelpRequested, ParseError, SchemaError, VersionRequested } from "./erro
 import type { ParseArgsOptions, ParseResult, RootSchema } from "./types.ts";
 export type { ParseArgsOptions, ParseResult, RootSchema } from "./types.ts";
 
-declare module "zod" {
+declare module "zod/v4/core" {
   interface GlobalMeta {
     /** Treat this field as a positional argument instead of a named option. */
     positional?: boolean;
