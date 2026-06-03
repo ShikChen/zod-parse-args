@@ -497,4 +497,7 @@ test("types", () => {
     ["--size", "640", "360"],
     { size: [640, 360] },
   );
+
+  // @ts-expect-error positional is typed as boolean by GlobalMeta augmentation
+  z.string().meta({ positional: 42 });
 });
