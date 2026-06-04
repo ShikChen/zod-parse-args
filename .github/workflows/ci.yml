@@ -9,6 +9,7 @@ on:
 
 jobs:
   test:
+    name: test (node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -23,3 +24,15 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run test:e2e
+  zod-compat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 26
+      - run: npm ci
+      - run: npm i --no-save zod@4.0.0 && npm test
+      - run: npm i --no-save zod@latest && npm test
+      - run: npm i --no-save zod@canary && npm test
+        continue-on-error: true
