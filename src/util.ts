@@ -37,7 +37,7 @@ export function unwrapSchema(schema: z.$ZodType): InnerType {
         defaultValue: def.defaultValue,
       };
     case "nonoptional":
-      return { ...unwrapSchema(def.innerType), optional: false };
+      return { ...unwrapSchema(def.innerType), optional: false, defaultValue: undefined };
     case "catch":
     case "nullable":
     case "readonly":

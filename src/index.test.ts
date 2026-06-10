@@ -42,10 +42,12 @@ function expectOk<T extends RootSchema>(
 function expectHelp<T extends RootSchema>(
   schema: T,
   args: string[] | ParseArgsOptions,
-  help: string,
+  help: string | RegExp,
 ) {
   const res = safeParseArgs(schema, asArgs(args));
-  expect(res).toEqual({ kind: "help", help: expect.stringContaining(help) });
+  const matcher =
+    typeof help === "string" ? expect.stringContaining(help) : expect.stringMatching(help);
+  expect(res).toEqual({ kind: "help", help: matcher });
 }
 
 function expectVersion<T extends RootSchema>(
@@ -368,7 +370,16 @@ test("help", () => {
   expectHelp(obj({ tag: z.array(z.enum(["a", "b"])) }), ["--help"], "(choices: a, b)");
   expectHelp(obj({ tag: z.set(z.enum(["a", "b"])) }), ["--help"], "(choices: a, b)");
   expectHelp(obj({ tag: z.array(z.string()) }), ["--help"], "(repeatable)");
-  expectHelp(obj({ name: z.string().describe("First.\n\nSecond.") }), ["--help"], "First.\n\n");
+  expectHelp(
+    obj({ n: z.number().default(5).nonoptional() }),
+    ["--help"],
+    /--n <value>\s+\(required\)$/m,
+  );
+  expectHelp(
+    obj({ name: z.string().describe("First\n\nSecond") }),
+    ["--help"],
+    /First\n\n\s+Second/m,
+  );
   expectOk(obj({ help: z.boolean() }), ["--help"], { help: true });
   expect(parse(kvStoreSchema)).toMatchSnapshot();
   expect(parse(kvStoreSchema, ["get", "--help"])).toMatchSnapshot();
