@@ -12,7 +12,7 @@ import {
 import { SchemaError } from "./errors.ts";
 import type { RawParseIssue } from "./types.ts";
 
-function parseValueIssue(expected: string, input: unknown): RawParseIssue {
+function parseValueIssue(expected: string, input: string): RawParseIssue {
   return {
     code: "custom",
     message: `Expected ${expected}, got ${JSON.stringify(input)}`,
