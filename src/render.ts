@@ -60,9 +60,11 @@ function renderPositionalMetavar(field: FieldSpec): string {
 }
 
 function renderOptionLabel(opt: FieldSpec): string {
-  const long = opt.value.kind === "bool" ? `[no-]${opt.long}` : `${opt.long}`;
+  const isBool = opt.value.kind === "bool";
+  const long = isBool ? `[no-]${opt.long}` : opt.long;
   let label = opt.short !== null ? `-${opt.short}, --${long}` : `--${long}`;
-  if (opt.value.kind !== "bool") label += " " + renderMetavar(opt.metavar, "<>");
+  const metavar = isBool ? "" : renderMetavar(opt.metavar, "<>");
+  if (metavar !== "") label += " " + metavar;
   return label;
 }
 

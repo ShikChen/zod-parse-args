@@ -347,6 +347,9 @@ export function compileSchema(schema: z.$ZodType): CommandSpec {
           throw new SchemaError("Tuple fields cannot be set from environment");
         }
         if (meta.positional) {
+          if (value.kind === "tuple" && value.size === 0) {
+            throw new SchemaError("Unsupported empty tuple positional");
+          }
           if (value.kind === "array") {
             if (positionalArray !== null) {
               throw new SchemaError("Unsupported multiple array positionals in the same level");

@@ -153,6 +153,7 @@ test("collection", () => {
   expectOk(obj({ size: z.tuple([z.number(), z.number()]) }), ["--size", "640", "480"], {
     size: [640, 480],
   });
+  expectOk(obj({ ack: z.tuple([]) }), ["--ack"], { ack: [] });
   expectOk(
     obj({
       map: z.map(
@@ -470,6 +471,7 @@ test("schema error", () => {
   bad(obj({ foo: z.string().meta({ metavar: ["value"] }) }));
   bad(obj({ foo: z.tuple([z.int(), z.int()]).meta({ metavar: ["x"] }) }));
   bad(obj({ foo: z.tuple([z.int()], z.string()) }));
+  bad(obj({ foo: z.tuple([]).meta({ positional: true }) }));
   bad(kvStoreSchema.meta({ metavar: ["command"] }));
   bad(obj({ kv1: kvStoreSchema, kv2: kvStoreSchema }));
   const posIntArray = z.int().array().meta({ positional: true });
