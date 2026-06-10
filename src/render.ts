@@ -7,8 +7,8 @@ interface HelpItem {
   description: string;
 }
 
-function renderMetavar(labels: string[], brackets: "<>" | "[]"): string {
-  return labels.map((label) => `${brackets[0]}${label}${brackets[1]}`).join(" ");
+function space(count: number): string {
+  return " ".repeat(count);
 }
 
 function wordWrap(text: string, maxWidth: number): string[] {
@@ -32,6 +32,10 @@ function wordWrap(text: string, maxWidth: number): string[] {
     curLen += word.length;
   }
   for (const line of text.split("\n")) {
+    if (line.trim() === "") {
+      lines.push(""); // Preserve intentional blank lines.
+      continue;
+    }
     for (const match of line.matchAll(/\s*\S+/g)) {
       const word = match[0];
       push(word);
@@ -39,6 +43,10 @@ function wordWrap(text: string, maxWidth: number): string[] {
     flush();
   }
   return lines;
+}
+
+function renderMetavar(labels: string[], brackets: "<>" | "[]"): string {
+  return labels.map((label) => `${brackets[0]}${label}${brackets[1]}`).join(" ");
 }
 
 function renderPositionalMetavar(field: FieldSpec): string {
@@ -49,6 +57,13 @@ function renderPositionalMetavar(field: FieldSpec): string {
     return `[${renderMetavar(field.metavar, "<>")}]`;
   }
   return field.optional ? renderMetavar(field.metavar, "[]") : renderMetavar(field.metavar, "<>");
+}
+
+function renderOptionLabel(opt: FieldSpec): string {
+  const long = opt.value.kind === "bool" ? `[no-]${opt.long}` : `${opt.long}`;
+  let label = opt.short !== null ? `-${opt.short}, --${long}` : `--${long}`;
+  if (opt.value.kind !== "bool") label += " " + renderMetavar(opt.metavar, "<>");
+  return label;
 }
 
 function renderCommandPath(spec: CommandSpec): string {
@@ -72,22 +87,24 @@ function renderAlignedSection(items: HelpItem[], maxWidth: number): string {
   const labelWidth = Math.max(0, Math.min(longestLabelWidth, (maxWidth >> 1) - indent - gap));
   const descWidth = maxWidth - (indent + labelWidth + gap);
   const lines: string[] = [];
+  function push(line: string) {
+    lines.push(line.trimEnd());
+  }
+
   for (const { label, description } of items) {
     if (description.trim() === "") {
-      lines.push(" ".repeat(indent) + label);
+      push(space(indent) + label);
       continue;
     }
     const descLines = wordWrap(description, descWidth);
     assert(descLines.length > 0, "Unexpected empty description lines");
     if (label.length <= labelWidth) {
-      lines.push(
-        [" ".repeat(indent), label.padEnd(labelWidth), " ".repeat(gap), descLines.shift()].join(""),
-      );
+      push([space(indent), label.padEnd(labelWidth), space(gap), descLines.shift()].join(""));
     } else {
-      lines.push(" ".repeat(indent) + label);
+      push(space(indent) + label);
     }
     for (const line of descLines) {
-      lines.push(" ".repeat(indent + labelWidth + gap) + line);
+      push(space(indent + labelWidth + gap) + line);
     }
   }
 
@@ -143,11 +160,7 @@ export function renderHelp(spec: CommandSpec, opts: ParseArgsOptions): string {
 
   const optItems: HelpItem[] = [];
   for (const opt of enumerateOptionFields(spec)) {
-    const long = opt.value.kind === "bool" ? `[no-]${opt.long}` : `${opt.long}`;
-    const label = [
-      opt.short !== null ? `-${opt.short}, --${long}` : `--${long}`,
-      opt.value.kind !== "bool" ? renderMetavar(opt.metavar, "<>") : "",
-    ].join(" ");
+    const label = renderOptionLabel(opt);
     const desc = [];
     if (opt.description !== null) desc.push(opt.description);
     if (opt.choices !== null) desc.push(`(choices: ${opt.choices.join(", ")})`);

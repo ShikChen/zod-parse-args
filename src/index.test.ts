@@ -362,6 +362,7 @@ test("help", () => {
   expectHelp(obj({ tag: z.array(z.enum(["a", "b"])) }), ["--help"], "(choices: a, b)");
   expectHelp(obj({ tag: z.set(z.enum(["a", "b"])) }), ["--help"], "(choices: a, b)");
   expectHelp(obj({ tag: z.array(z.string()) }), ["--help"], "(repeatable)");
+  expectHelp(obj({ name: z.string().describe("First.\n\nSecond.") }), ["--help"], "First.\n\n");
   expectOk(obj({ help: z.boolean() }), ["--help"], { help: true });
   expect(parse(kvStoreSchema)).toMatchSnapshot();
   expect(parse(kvStoreSchema, ["get", "--help"])).toMatchSnapshot();
