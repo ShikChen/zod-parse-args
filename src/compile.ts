@@ -4,7 +4,7 @@ import {
   camelToKebab,
   getDef,
   getEnumMap,
-  hasImplicitDefault,
+  getImplicitDefault,
   isDUDef,
   isStringArray,
   repr,
@@ -340,7 +340,7 @@ export function compileSchema(schema: z.$ZodType): CommandSpec {
           description: meta.description,
           target: key,
           value,
-          optional: inner.optional || hasImplicitDefault(inner.schema),
+          optional: inner.optional || getImplicitDefault(inner.schema) !== undefined,
           defaultValue: inner.defaultValue,
         };
         if (meta.env !== null && value.kind === "tuple") {

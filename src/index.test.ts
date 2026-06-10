@@ -96,6 +96,7 @@ test("scalar", () => {
   });
 
   expectOk(obj({ json: z.boolean() }), ["--json"], { json: true });
+  expectOk(obj({ json: z.boolean() }), [], { json: false });
   expectOk(obj({ ssl: z.stringbool() }), ["--ssl", "true"], { ssl: true });
 
   expectOk(obj({ env: z.enum(["dev", "prod"]) }), ["--env", "prod"], {
@@ -154,6 +155,10 @@ test("collection", () => {
     size: [640, 480],
   });
   expectOk(obj({ ack: z.tuple([]) }), ["--ack"], { ack: [] });
+  expectOk(obj({ tag: z.array(z.string()) }), [], { tag: [] });
+  expectOk(obj({ tag: z.set(z.string()) }), [], { tag: new Set<string>() });
+  expectOk(obj({ tag: z.record(z.string(), z.string()) }), [], { tag: {} });
+  expectOk(obj({ tag: z.map(z.string(), z.string()) }), [], { tag: new Map<string, string>() });
   expectOk(
     obj({
       map: z.map(

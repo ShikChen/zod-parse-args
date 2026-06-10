@@ -4,6 +4,7 @@ import {
   assert,
   getDef,
   getEnumMap,
+  getImplicitDefault,
   isDUDef,
   preprocess,
   repr,
@@ -143,40 +144,40 @@ function splitKeyValueEntries<T>(
 
 function coerceMap(schema: z.$ZodMap): z.$ZodType {
   const def = schema._zod.def;
-  return withImplicitDefault(
-    preprocess(
-      (input, ctx) => splitKeyValueEntries(input, ctx, (x) => new Map(x)),
-      z.util.clone(schema, {
-        ...def,
-        keyType: buildCoercedSchema(def.keyType),
-        valueType: buildCoercedSchema(def.valueType),
-      }),
-    ),
-    [],
+  return preprocess(
+    (input, ctx) => splitKeyValueEntries(input, ctx, (x) => new Map(x)),
+    z.util.clone(schema, {
+      ...def,
+      keyType: buildCoercedSchema(def.keyType),
+      valueType: buildCoercedSchema(def.valueType),
+    }),
   );
 }
 
 function coerceRecord(schema: z.$ZodRecord): z.$ZodType {
   const def = schema._zod.def;
-  return withImplicitDefault(
-    preprocess(
-      (input, ctx) => splitKeyValueEntries(input, ctx, Object.fromEntries),
-      z.util.clone(schema, {
-        ...def,
-        // Although $ZodRecord has built-in number coercion for keys, we still
-        // build coerced schemas for them to have consistent parsing behavior
-        // and error messages.
-        keyType: buildCoercedSchema(def.keyType),
-        valueType: buildCoercedSchema(def.valueType),
-      }),
-    ),
-    [],
+  return preprocess(
+    (input, ctx) => splitKeyValueEntries(input, ctx, Object.fromEntries),
+    z.util.clone(schema, {
+      ...def,
+      // Although $ZodRecord has built-in number coercion for keys, we still
+      // build coerced schemas for them to have consistent parsing behavior
+      // and error messages.
+      keyType: buildCoercedSchema(def.keyType),
+      valueType: buildCoercedSchema(def.valueType),
+    }),
   );
 }
 
 export function buildCoercedSchema<T extends z.$ZodType>(schema: T): z.$ZodType<z.output<T>>;
 
 export function buildCoercedSchema(schema: z.$ZodType): z.$ZodType {
+  const coerced = coerceSchema(schema);
+  const makeDefault = getImplicitDefault(schema);
+  return makeDefault === undefined ? coerced : withImplicitDefault(coerced, makeDefault());
+}
+
+function coerceSchema(schema: z.$ZodType): z.$ZodType {
   const def = getDef(schema);
 
   switch (def.type) {
@@ -197,7 +198,7 @@ export function buildCoercedSchema(schema: z.$ZodType): z.$ZodType {
     case "date":
       return fromString(parseDate, schema);
     case "boolean":
-      return fromString(parseBoolean, withImplicitDefault(schema, false));
+      return fromString(parseBoolean, schema);
 
     // Wrapper types
     case "optional":
@@ -240,26 +241,20 @@ export function buildCoercedSchema(schema: z.$ZodType): z.$ZodType {
         items: def.items.map((item) => buildCoercedSchema(item)),
       });
     case "array":
-      return withImplicitDefault(
-        z.util.clone(schema as z.$ZodArray, {
-          ...def,
-          element: buildCoercedSchema(def.element),
-        }),
-        [],
-      );
+      return z.util.clone(schema as z.$ZodArray, {
+        ...def,
+        element: buildCoercedSchema(def.element),
+      });
     case "set":
-      return withImplicitDefault(
-        preprocess(
-          (input) => {
-            assert(Array.isArray(input), "Expected array input for set schema");
-            return new Set(input);
-          },
-          z.util.clone(schema as z.$ZodSet, {
-            ...def,
-            valueType: buildCoercedSchema(def.valueType),
-          }),
-        ),
-        [],
+      return preprocess(
+        (input) => {
+          assert(Array.isArray(input), "Expected array input for set schema");
+          return new Set(input);
+        },
+        z.util.clone(schema as z.$ZodSet, {
+          ...def,
+          valueType: buildCoercedSchema(def.valueType),
+        }),
       );
     case "map":
       return coerceMap(schema as z.$ZodMap);

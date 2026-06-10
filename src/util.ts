@@ -76,15 +76,15 @@ export function getEnumMap(def: z.$ZodEnumDef): Map<string, z.util.EnumValue> {
   }
   return map;
 }
-const IMPLICIT_DEFAULT_TYPES = new Set<z.$ZodTypes["_zod"]["def"]["type"]>([
-  "boolean",
-  "array",
-  "set",
-  "map",
-  "record",
+const IMPLICIT_DEFAULTS = new Map<z.$ZodTypes["_zod"]["def"]["type"], () => unknown>([
+  ["boolean", () => false],
+  ["array", () => []],
+  ["set", () => []],
+  ["map", () => []],
+  ["record", () => []],
 ]);
-export function hasImplicitDefault(schema: z.$ZodType): boolean {
-  return IMPLICIT_DEFAULT_TYPES.has(getDef(schema).type);
+export function getImplicitDefault(schema: z.$ZodType): (() => unknown) | undefined {
+  return IMPLICIT_DEFAULTS.get(getDef(schema).type);
 }
 // }}}
 
