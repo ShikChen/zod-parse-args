@@ -138,24 +138,20 @@ export function renderHelp(spec: CommandSpec, opts: ParseArgsOptions): string {
 
   if (spec.positionals.length > 0) {
     lines.push("Arguments:");
-    const items = spec.positionals.map(
-      (pos): HelpItem => ({
-        label: renderPositionalMetavar(pos),
-        description: pos.description ?? "",
-      }),
-    );
+    const items = spec.positionals.map((pos): HelpItem => ({
+      label: renderPositionalMetavar(pos),
+      description: pos.description ?? "",
+    }));
     lines.push(renderAlignedSection(items, maxWidth));
     lines.push("");
   }
 
   if (spec.subcommand !== null) {
     lines.push("Commands:");
-    const items = spec.subcommand.variants.map(
-      (variant): HelpItem => ({
-        label: variant.values.join(", "),
-        description: variant.spec.description ?? "",
-      }),
-    );
+    const items = spec.subcommand.variants.map((variant): HelpItem => ({
+      label: variant.values.join(", "),
+      description: variant.spec.description ?? "",
+    }));
     lines.push(renderAlignedSection(items, maxWidth));
     lines.push("");
   }

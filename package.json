@@ -46,13 +46,13 @@
     "prepublishOnly": "npm run test && npm run typecheck"
   },
   "devDependencies": {
-    "@types/node": "^25.9.1",
-    "@typescript/native-preview": "^7.0.0-dev.20260603.1",
-    "@vitest/coverage-v8": "^4.1.8",
-    "oxfmt": "^0.53.0",
-    "vitest": "^4.1.8",
+    "@types/node": "^26.4.0",
+    "@typescript/native-preview": "^7.0.0-dev.20260707.2",
+    "@vitest/coverage-v8": "^4.1.11",
+    "oxfmt": "^0.65.0",
+    "vitest": "^4.1.11",
     "zod": "^4.0.0",
-    "zshy": "^0.7.2"
+    "zshy": "^0.7.3"
   },
   "peerDependencies": {
     "zod": "^4.0.0"

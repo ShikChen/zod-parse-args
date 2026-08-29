@@ -13,7 +13,10 @@ try {
     cwd: projectRoot,
     stdio: "ignore",
   });
-  const tarballPath = join(dir, readdirSync(dir).find((f) => f.endsWith(".tgz"))!);
+  const tarballPath = join(
+    dir,
+    readdirSync(dir).find((f) => f.endsWith(".tgz"))!,
+  );
 
   writeFileSync(join(dir, "package.json"), JSON.stringify({ type: "module" }));
 
