@@ -77,9 +77,8 @@ function withImplicitDefault<T extends z.$ZodType>(
   schema: T,
   defaultValue: z.input<T>,
 ): z.$ZodType {
-  // Not using $ZodPrefault because it sets optin="optional", which prevents
-  // $ZodOptional from short-circuiting on undefined input. Wrapping in
-  // Pipe(Transform, schema) hides optin from Optional.
+  // Use preprocess instead of $ZodPrefault so an explicit .optional() still
+  // yields undefined when omitted.
   return preprocess((input) => (input === undefined ? defaultValue : input), schema);
 }
 

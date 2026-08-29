@@ -180,6 +180,7 @@ test("collection", () => {
 
 test("wrapper", () => {
   expectOk(obj({ user: z.string().optional() }), [], { user: undefined });
+  expectOk(obj({ color: z.boolean().optional() }), [], { color: undefined });
   expectParseError(obj({ user: z.string().optional().nonoptional() }), []);
   expectOk(obj({ user: z.string().default("root") }), [], { user: "root" });
   expectOk(obj({ user: z.string().nullable().default(null) }), [], {
